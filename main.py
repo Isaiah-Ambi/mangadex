@@ -76,6 +76,17 @@ def download_chapter(chapter_id):
     data = r_json["chapter"]["data"]
     data_saver = r_json["chapter"]["dataSaver"]
         
+    # Making a folder to store the images in.
+    folder_path = f"Mangadex/{chapter_id}"
+    os.makedirs(folder_path, exist_ok=True)
+
+    for page in data:
+        r = requests.get(f"{host}/data/{chapter_hash}/{page}")
+
+        with open(f"{folder_path}/{page}", mode="wb") as f:
+            f.write(r.content)
+
+    print(f"Downloaded {len(data)} pages.")
 
 def main():
     title = input('input title ')
@@ -84,13 +95,13 @@ def main():
     chapter_id = get_chapter_id(manga_id)
     chapter_len = len(chapter_id)
     print(chapter_len)
-    chapter_select = input('select chapters 1 to {chapter_len}')
+    chapter_select = int(input('select chapters 1 to {chapter_len}'))
     if chapter_select > 0 and chapter_select <= chapter_len:
         chapter_id = chapter_id[chapter_select - 1]
+        download_chapter(chapter_id)
     else:
         print("invalid chapter")
 
-    download_chapter(chapter_id)
         
 if __name__ == "__main__":
     main()
