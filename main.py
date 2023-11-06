@@ -11,12 +11,14 @@ def search_manga_title(title):
         params={"title": title}
     )
 
+    #print([manga["attributes"]["title"] for manga in r.json()["data"]])
     print([manga["attributes"]["title"]["en"] for manga in r.json()["data"]])
 
     #searching manga title
     result = []
     for manga in r.json()["data"]:
-        result.append(manga["attributes"]["title"]["en"])
+        #result.append(manga["attributes"]["title"]["en"])
+        result.append(manga["attributes"]["title"])
     #return result
     sn = 0
     #display results
@@ -66,7 +68,7 @@ def display_meta():
     pass
 
 #download chapters
-def download_chapter(chapter_id):
+def download_chapter(chapter_id, manga_title, chapter_select):
 
     r = requests.get(f"{base_url}/at-home/server/{chapter_id}")
     r_json = r.json()
@@ -77,7 +79,8 @@ def download_chapter(chapter_id):
     data_saver = r_json["chapter"]["dataSaver"]
         
     # Making a folder to store the images in.
-    folder_path = f"Mangadex/{chapter_id}"
+    #folder_path = f"Mangadex/{manga_title}/{chapter_id}"
+    folder_path = f"Mangadex/{manga_title}/{chapter_select}"
     os.makedirs(folder_path, exist_ok=True)
 
     for page in data:
@@ -94,11 +97,13 @@ def main():
     manga_id = get_manga_id(manga_title)
     chapter_id = get_chapter_id(manga_id)
     chapter_len = len(chapter_id)
+    manga_name = [manga_title['en']]
+    manga_title = manga_name[0]
     print(chapter_len)
     chapter_select = int(input('select chapters 1 to {chapter_len}'))
     if chapter_select > 0 and chapter_select <= chapter_len:
         chapter_id = chapter_id[chapter_select - 1]
-        download_chapter(chapter_id)
+        download_chapter(chapter_id, manga_title, chapter_select)
     else:
         print("invalid chapter")
 
